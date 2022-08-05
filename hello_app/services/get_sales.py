@@ -1,7 +1,10 @@
+import os
 import json
 
 def get_sales():
-  file_name = './static/sales.json'
-  with open(file_name) as file:
+  dirname = os.path.dirname(__file__)
+  filename = os.path.join(dirname, './static/sales.json')
+  print(dirname, filename)
+  with open(filename) as file:
     data = json.load(file)
   return data
