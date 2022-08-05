@@ -35,4 +35,6 @@ When you submit a pull request, a CLA-bot automatically determines whether you n
 
 <!-- pip3 install -r requirements.txt  
 FLASK_APP=webapp flask run   
-pytest -->
+pytest 
+git push -u origin master
+-->
