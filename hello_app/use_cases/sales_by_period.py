@@ -7,7 +7,6 @@ months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 
 
 def sales_by_period(args):
     data = get_sales()
-    
     statistics = dict()
     statistics['day'] = sales_by_specific_period(data, args, period='day')
     statistics['month'] = sales_by_specific_period(data, args, period='month')
@@ -25,27 +24,35 @@ def sales_by_specific_period(data, args, period='day'):
         elif period == 'weekday': key = day_of_the_week[datetime.strptime(day, '%Y-%m-%d').weekday()]
 
         statistics[key]['date'] = key
-        statistics[key]['total'] += sale['total']
+        add_data(statistics[key]['all'], sale)
         if 'waiter' in args:
-            statistics[key]['waiter'][sale['waiter']] += sale['total']
+            add_data(statistics[key]['waiter'][sale['waiter']], sale)
         if 'cashier' in args:
-            statistics[key]['cashier'][sale['cashier']] += sale['total']
+            add_data(statistics[key]['cashier'][sale['cashier']], sale)
         if 'zone' in args:
-            statistics[key]['zone'][sale['zone']] += sale['total']
+            add_data(statistics[key]['zone'][sale['zone']], sale)
         if 'time' in args:
             if int(time.split(':')[0]) <= 16:
-                statistics[key]['time']['lunch'] += sale['total']
+                add_data(statistics[key]['time']['lunch'], sale)
             else:
-                statistics[key]['time']['dinner'] += sale['total']
+                add_data(statistics[key]['time']['dinner'], sale)
     
     return list(statistics.values())
 
+def add_data(indicators, sale):
+    indicators['total'] += sale['total']
+    indicators['max'] = max(indicators['max'], sale['total'])
+    indicators['min'] = min(indicators['min'], sale['total']) if indicators['min'] != 0 else sale['total']
+    indicators['num_sales'] += 1
+
 def dict_init():
+    indicators = lambda: {'total': 0, 'max': 0, 'min': 0, 'num_sales': 0}
+    # tiempo 
     day = {
-        'total': 0,
-        'waiter': defaultdict(lambda: 0),
-        'cashier': defaultdict(lambda: 0),
-        'zone': defaultdict(lambda: 0),
-        'time': {'lunch': 0, 'dinner': 0}
+        'all': indicators() ,
+        'waiter': defaultdict(lambda: indicators()),
+        'cashier': defaultdict(lambda: indicators()),
+        'zone': defaultdict(lambda: indicators()),
+        'time': defaultdict(lambda: indicators())
     }
     return day
